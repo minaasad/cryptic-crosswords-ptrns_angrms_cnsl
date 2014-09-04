@@ -6,9 +6,16 @@ using System.Threading.Tasks;
 
 namespace m_crossword
 {
-    class M_Dictionary
+    class MDictionary
     {
         public List<String> dictionary_words { get; set; }
+
+        /// <summary>
+        /// MDictionary Constructor
+        /// </summary>
+        public MDictionary()
+        {
+        }
 
         /// <summary>
         /// Loads lines (assumed to be words) from 
