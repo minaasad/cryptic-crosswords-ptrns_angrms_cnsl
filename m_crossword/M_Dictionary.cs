@@ -18,19 +18,14 @@ namespace m_crossword
         public void LoadFromFile(String filePath)
         {
             dictionary_words = new List<String>();
-
             string word;
             
             System.IO.StreamReader file = new System.IO.StreamReader(filePath);
-            
             while ((word = file.ReadLine()) != null)
             {
                 dictionary_words.Add(word);
             }
-
             file.Close();
-
-            //ToDo: Validate words inside text file
         }
     }
 }

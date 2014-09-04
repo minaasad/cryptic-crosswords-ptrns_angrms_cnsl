@@ -13,7 +13,8 @@ namespace m_crossword
         private static M_Dictionary newDictionary;
 
         /// <summary>
-        /// Main method when application starts
+        /// Main method when application starts. Handles
+        /// user entered arguments accordingly.
         /// </summary>
         /// <param name="args">Arguments passed to application</param>
         static void Main(string[] args)
@@ -35,61 +36,16 @@ namespace m_crossword
 
                 case "P":
                     //Patterns
-                    if (!args[2].Contains("_"))
-                    {
-                        Console.WriteLine("No placeholders/underscores found.");
-                        break;
-                    }
+                    //if (!args[2].Contains("_"))
+                    //{
+                    //    Console.WriteLine("No placeholders/underscores found.");
+                    //    break;
+                    //}
                     matchesFound = WriteOutPatterns(args[2], matchesFound);
                     break;
             }
 
             Console.WriteLine("Matches: " + matchesFound);
-        }
-
-        private static int WriteOutPatterns(string user_word, int counter)
-        {
-            List<string> fixedLetters = new List<string>();
-
-            for (int i = 0; i < user_word.Length; i++)
-            {
-                if (user_word[i] != '_')
-                {
-                    fixedLetters.Add(i + ":" + user_word[i]);
-                }
-            }
-
-            foreach (var dictionary_word in newDictionary.dictionary_words)
-            {
-                    if (IsPattern(dictionary_word, fixedLetters, user_word.Length))
-                    {
-                        counter++;
-                        Console.WriteLine(counter + ": " + dictionary_word);
-                    }
-            }
-            return counter;
-        }
-
-        /// <summary>
-        /// This method should performed if first argument is "A" (anagram).
-        /// It passes the user's word and checks it for anagrams against 
-        /// the dictionary words. It also writes in the console output its'
-        /// results as well as keeps track of how many matches were found.
-        /// </summary>
-        /// <param name="user_word">String letters that user entered</param>
-        /// <param name="counter">Starting position of counter. Ideally 0</param>
-        /// <returns>Number of anagram matches found</returns>
-        private static int WriteOutAnagrams(string user_word, int counter)
-        {
-            foreach (var dictionary_word in newDictionary.dictionary_words)
-            {
-                if (IsAnagram(dictionary_word, user_word))
-                {
-                    counter++;
-                    Console.WriteLine(counter + ": " + dictionary_word);
-                }
-            }
-            return counter;
         }
 
         /// <summary>
@@ -122,8 +78,8 @@ namespace m_crossword
                 //Validate against any unwanted punctuation characters
                 foreach (char user_word_char in args[2])
                 {
-                    if (user_word_char.Equals('_')) 
-                    { 
+                    if (user_word_char.Equals('_'))
+                    {
                         //Do nothing: this punctuation letter is an exception.
                     }
                     else if (char.IsPunctuation(user_word_char))
@@ -141,9 +97,9 @@ namespace m_crossword
                     Console.WriteLine("Please use the format: [A|P]");
                     return false;
                 }
-           
+
                 //Check if dictionary file is empty
-                if (new FileInfo(args[1]).Length ==0) 
+                if (new FileInfo(args[1]).Length == 0)
                 {
                     Console.WriteLine("Invalid second argument '" + args[1] + "'");
                     Console.WriteLine("Please make sure it is a non-empty readable dictionary file");
@@ -162,8 +118,60 @@ namespace m_crossword
                 return false;
             }
             return true;
+        }
 
+        /// <summary>
+        /// This method should performed if first argument is "A" (anagram).
+        /// It passes the user's word and checks it for anagrams against 
+        /// the dictionary words. It also writes in the console output its'
+        /// results as well as keeps track of how many matches were found.
+        /// </summary>
+        /// <param name="user_word">String letters that user entered</param>
+        /// <param name="counter">Starting position of counter. Ideally 0</param>
+        /// <returns>Number of anagram matches found</returns>
+        private static int WriteOutAnagrams(string user_word, int counter)
+        {
+            foreach (var dictionary_word in newDictionary.dictionary_words)
+            {
+                if (IsAnagram(dictionary_word, user_word))
+                {
+                    counter++;
+                    Console.WriteLine(counter + ": " + dictionary_word);
+                }
+            }
+            return counter;
+        }
 
+        /// <summary>
+        /// This method should performed if first argument is "P" (pattern).
+        /// It passes the user's word and checks it for patterns against 
+        /// the dictionary words. It also writes in the console output its'
+        /// results as well as keeps track of how many matches were found.
+        /// </summary>
+        /// <param name="user_word">String letters that user entered</param>
+        /// <param name="counter">Starting position of counter. Ideally 0</param>
+        /// <returns>Number of pattern matches found</returns>
+        private static int WriteOutPatterns(string user_word, int counter)
+        {
+            List<string> fixedLetters = new List<string>();
+
+            for (int i = 0; i < user_word.Length; i++)
+            {
+                if (user_word[i] != '_')
+                {
+                    fixedLetters.Add(i + ":" + user_word[i]);
+                }
+            }
+
+            foreach (var dictionary_word in newDictionary.dictionary_words)
+            {
+                if (IsPattern(dictionary_word, fixedLetters, user_word.Length))
+                {
+                    counter++;
+                    Console.WriteLine(counter + ": " + dictionary_word);
+                }
+            }
+            return counter;
         }
 
         /// <summary>
@@ -179,19 +187,14 @@ namespace m_crossword
         {
             //Validate words
             //Must be of same length and not empty
-            if (string.IsNullOrEmpty(dictionary_word) || string.IsNullOrEmpty(user_word))
-            {
-                return false;
-            }
-               
-            if (dictionary_word.Length != user_word.Length)
+            if (string.IsNullOrEmpty(dictionary_word) || string.IsNullOrEmpty(user_word) || dictionary_word.Length != user_word.Length)
             {
                 return false;
             }
 
-            foreach (char user_word_char in user_word)
+            foreach (char user_word_char in user_word.ToLower())
             {
-                int char_index = dictionary_word.IndexOf(user_word_char);
+                int char_index = dictionary_word.ToLower().IndexOf(user_word_char);
                 
                 if (char_index >= 0)
                 {
@@ -227,7 +230,7 @@ namespace m_crossword
                     string[] index_char = user_char_value.ToString().Split(':');
                     char char_at_index = dictionary_word[int.Parse(index_char[0])];
                     
-                    if (!(char_at_index.ToString().Equals(index_char[1])))
+                    if (!(char_at_index.ToString().ToLower().Equals(index_char[1].ToLower())))
                     {
                         return false;
                     }
